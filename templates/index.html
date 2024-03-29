@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Currency detector</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='camstyle.css') }}">
+</head>
+
+<body>
+    <div class="title">
+
+        <h1>Fake Currency Note Detection</h1>
+    </div>
+        <div class="webcam-rendering">
+
+        <!-- <img src="{{ url_for('video') }}" alt="webcam" width="50%"> -->
+
+        <img class="video" src="{{ url_for('video') }}" width="640" height="480" alt="hi">
+        <!-- <video id="video" width="640" height="480" autoplay></video> -->
+
+
+    </div>
+    <div class="capturing button"> <button class="btn" type="button">Capture the image in 10 seconds</button></div>
+    <div class="output" id="predicted-value">Predicted Value: </div>
+    <script>
+        // Send a signal to the server when the window is being unloaded or closed
+        window.addEventListener('beforeunload', function (event) {
+            navigator.sendBeacon("/close", "");
+        });
+
+        // Get the video element
+        //const video = document.getElementById('video');
+
+        // Add event listener for key press
+        document.querySelector('.btn').addEventListener('click', function (event) {
+            setTimeout(() => {
+
+                // Send a signal to the server to capture the frame
+                fetch('/capture', {
+                        method: 'POST'
+                    })
+                    .then(response => response.text()) // Parse response as text
+                    .then(predictedValue => {
+                        // Update the content of the placeholder element with the predicted value
+                        document.getElementById('predicted-value').innerText = 'Predicted Value: ' +
+                            predictedValue;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }, 10000);
+
+        });
+    </script>
+
+
+
+</body>
+
+</html>
